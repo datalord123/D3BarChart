@@ -15,6 +15,8 @@
 <div class="chart"></div>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
+// Relevant Code: http://bost.ocks.org/mike/bar/
+
 
 var data = [4, 8, 15, 16, 23, 42];
 
@@ -28,6 +30,5 @@ d3.select(".chart")
   .enter().append("div")
     .style("width", function(d) { return x(d) + "px"; })
     .text(function(d) { return d; });
-
 </script>
 
