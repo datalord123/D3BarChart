@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+
+    body {
+      padding: 10px;
+      background: #000;
+    }
+    div {
+      background: #333;
+      margin-bottom: 10px;
+      padding: 7px;
+      color: #fff;
+      font-family: Arial;
+      font-size: 12px; 
+    }
+
+.chart {
+  background: #fff;
+  font: 10px sans-serif;
+  shape-rendering: crispEdges;
+}
+.chart text {
+    fill: black;
+}
+.axis line, .axis path {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    text-shadow: 0 1px 0 #fff;
+    cursor: move;
+}
+
+</style>
+
+<body>
+<script src="http://d3js.org/d3.v2.js"></script>
+
+<script>
+
+  var distances = [2.23, 2.39, 2.59, 2.77, 3.05];
+
+// Define identity (1:1) scales
+var x = d3.scale.identity().domain([0,450]);
+var y = d3.scale.identity().domain([0,300]);
+
+// define an SVG element to hold our chart
+var chart = d3.select("body")
+  .append("svg")
+    .attr("class", "chart")
+    .attr("width", 490)
+    .attr("height", 330)
+    .append("g")
+      // move 0,0 slightly down and right to accomodate axes
+     .attr("transform", "translate(30,20)");
+
+//Animation and interaction
+d3.select('body').selectAll('div')
+  .data(distances)
+  .enter()
+    .append('div')
+    .html('...')
+    .style('width', '10px')
+    .style('opacity', 0)
+    .on("mouseover", function(){
+      d3.select(this).transition().duration(300)
+        .style("background-color", "#FFD700");
+    })
+    .on("mouseout", function(){
+      d3.select(this).transition().duration(300)
+        .style("background-color", "#333");
+    })
+    .transition()
+      .delay(function(d, i) { return i * 300 })
+      .duration(300)    
+      .style('width', function(d) { return (d * 150) + 'px'; })
+      .style('opacity', 1)
+      .text(function(d) { return d + ' miles'; });
+
+
+//draw the x grid lines
+// Draw X-axis grid lines
+chart.selectAll("line.x")
+  .data(x.ticks(10))
+  .enter().append("line")
+  .attr("class", "x")
+  .attr("x1", x)
+  .attr("x2", x)
+  .attr("y1", 0)
+  .attr("y2", 300)
+  .style("stroke", "#ccc");
+ 
+// Draw Y-axis grid lines
+chart.selectAll("line.y")
+  .data(y.ticks(10))
+  .enter().append("line")
+  .attr("class", "y")
+  .attr("x1", 0)
+  .attr("x2", 450)
+  .attr("y1", y)
+  .attr("y2", y)
+  .style("stroke", "#ccc");
+ 
+// Define stock x and y axis
+var xAxis = d3.svg.axis().scale(x).orient('top');
+var yAxis = d3.svg.axis().scale(y).orient('left');
+ 
+chart.append('g')
+  .attr("class", "axis")
+  .call(xAxis);
+ 
+chart.append('g')
+  .attr("class", "axis")
+  .call(yAxis);
+</script>
