@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.bar {
+  fill: steelblue;
+}
+
+.bar:hover {
+  fill: brown;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+var margin = {top: 50, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .2);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10, "$");
+
+var chart = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+d3.tsv("MiniProject2.tsv", type, function(error, data) {
+  if (error) throw error;
+
+  x.domain(data.map(function(d) { return d.name; }));
+  y.domain([0, d3.max(data, function(d) { return d.value;
+  })]);
+
+//Now add axis
+  //Append group element to chart itself
+  chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+
+    .append("text")
+      .attr("transform", "rotate(-90)") //This is where we tell to to be vertically oriented
+      .attr("y", 6) //text should be 6 pixels to right of axis
+      .attr("dy", ".71em") //this again helps adjust the position
+      .style("text-anchor", "end") //this positions text, anchored on the top right of y axis
+      .text("Revenue (bn)"); // the actual text we want to show
+
+//Create Bars variable, one for each data element
+var my_rects = chart.selectAll(".bar")
+  //append group(basically div) element to each data element
+  .data(data).enter().append("g");
+
+//Create Bars
+  my_rects.append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.name); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); });
+//Add text to the top of each bar
+  my_rects.append("text") //3
+      .attr("x", function(d){ return x(d.name) + x.rangeBand()/2 - 10;}) ///2 means middle, -10 is adjusdtment
+      .attr("y", function(d) { 
+        return y(d.value) - 15; // How high up it goes, 15 is the adjustment so there is a gap
+      })
+      .text(function(d) { return d.value; });  //Actual Value to return           
+});
+
+function type(d) {
+  d.value = +d.value;
+  return d;
+}
+
+
+
+</script>
